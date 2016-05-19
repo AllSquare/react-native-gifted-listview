@@ -86,7 +86,8 @@ var GiftedListView = React.createClass({
     renderSeparator: React.PropTypes.func,
 
     setRows: React.PropTypes.func,
-    getRows: React.PropTypes.func
+    getRows: React.PropTypes.func,
+    onFetchOptions: PropTypes.object,
   },
 
   _setPage(page) { this._page = page; },
@@ -213,7 +214,7 @@ var GiftedListView = React.createClass({
   },
 
   componentDidMount() {
-    this.props.onFetch(this._getPage(), this._postRefresh, {firstLoad: true});
+    this.props.onFetch(this._getPage(), this._postRefresh, {firstLoad: true, ...this.props.onFetchOptions });
   },
 
   setNativeProps(props) {
@@ -224,7 +225,7 @@ var GiftedListView = React.createClass({
     this._onRefresh({external: true});
   },
 
-  _onRefresh(options = {}) {
+  _onRefresh(options = { ...this.props.onFetchOptions }) {
     if (this.isMounted()) {
       this.setState({
         isRefreshing: true,
@@ -253,7 +254,7 @@ var GiftedListView = React.createClass({
   _onPaginate() {
     if (this.state.paginationStatus === 'firstLoad' || this.state.paginationStatus === 'waiting') {
       this.setState({paginationStatus: 'fetching'});
-      this.props.onFetch(this._getPage() + 1, this._postPaginate, {});
+      this.props.onFetch(this._getPage() + 1, this._postPaginate, { ...this.props.onFetchOptions });
     }
   },
 
