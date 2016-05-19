@@ -84,12 +84,26 @@ var GiftedListView = React.createClass({
     paginationWaitingView: React.PropTypes.func,
     emptyView: React.PropTypes.func,
     renderSeparator: React.PropTypes.func,
+
+    setRows: React.PropTypes.func,
+    getRows: React.PropTypes.func
   },
 
   _setPage(page) { this._page = page; },
   _getPage() { return this._page; },
-  _setRows(rows) { this._rows = rows; },
-  _getRows() { return this._rows; },
+  _setRows(rows) {
+    if (this.props.setRows) {
+      this.props.setRows(rows)
+      return
+    }
+    this._rows = rows;
+  },
+  _getRows() {
+    if (this.props.getRows) {
+      return this.props.getRows()
+    }
+    return this._rows;
+  },
 
 
   paginationFetchingView() {
