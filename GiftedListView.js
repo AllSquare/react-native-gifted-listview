@@ -85,6 +85,7 @@ var GiftedListView = React.createClass({
     emptyView: React.PropTypes.func,
     renderSeparator: React.PropTypes.func,
 
+    dataSource: React.PropTypes.object,
     setRows: React.PropTypes.func,
     getRows: React.PropTypes.func,
     onFetchOptions: React.PropTypes.object,
@@ -191,6 +192,14 @@ var GiftedListView = React.createClass({
     this._setRows([]);
 
     var ds = null;
+    const initialState = {
+      isRefreshing: false,
+      paginationStatus: 'firstLoad',
+    }
+
+    if (this.props.dataSource) {
+      return initialState
+    }
     if (this.props.withSections === true) {
       ds = new ListView.DataSource({
         rowHasChanged: (row1, row2) => row1 !== row2,
@@ -198,8 +207,7 @@ var GiftedListView = React.createClass({
       });
       return {
         dataSource: ds.cloneWithRowsAndSections(this._getRows()),
-        isRefreshing: false,
-        paginationStatus: 'firstLoad',
+        ...initialState
       };
     } else {
       ds = new ListView.DataSource({
@@ -207,8 +215,7 @@ var GiftedListView = React.createClass({
       });
       return {
         dataSource: ds.cloneWithRows(this._getRows()),
-        isRefreshing: false,
-        paginationStatus: 'firstLoad',
+        ...initialState
       };
     }
   },
@@ -282,11 +289,9 @@ var GiftedListView = React.createClass({
     if (rows !== null) {
       this._setRows(rows);
 
-      if (this.props.withSections === true) {
-        state.dataSource = this.state.dataSource.cloneWithRowsAndSections(rows);
-      } else {
-        if (options.useResult) {
-          state.dataSource = this.state.dataSource.cloneWithRows(rows.result);
+      if (!this.props.dataSource) {
+        if (this.props.withSections === true) {
+          state.dataSource = this.state.dataSource.cloneWithRowsAndSections(rows);
         } else {
           state.dataSource = this.state.dataSource.cloneWithRows(rows);
         }
