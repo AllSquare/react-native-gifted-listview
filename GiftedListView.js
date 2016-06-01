@@ -201,9 +201,6 @@ var GiftedListView = React.createClass({
   },
 
   getInitialState() {
-    this._setPage(1);
-    this._setRows([]);
-
     var ds = null;
     const initialState = {
       isRefreshing: false,
@@ -219,7 +216,7 @@ var GiftedListView = React.createClass({
         sectionHeaderHasChanged: (section1, section2) => section1 !== section2,
       });
       return {
-        dataSource: ds.cloneWithRowsAndSections(this._getRows()),
+        dataSource: ds.cloneWithRowsAndSections([]),
         ...initialState
       };
     } else {
@@ -227,10 +224,15 @@ var GiftedListView = React.createClass({
         rowHasChanged: (row1, row2) => row1 !== row2,
       });
       return {
-        dataSource: ds.cloneWithRows(this._getRows()),
+        dataSource: ds.cloneWithRows([]),
         ...initialState
       };
     }
+  },
+
+  componentWillMount() {
+    this._setPage(1);
+    this._setRows([]);
   },
 
   componentDidMount() {
