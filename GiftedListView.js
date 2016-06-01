@@ -88,11 +88,24 @@ var GiftedListView = React.createClass({
     dataSource: React.PropTypes.object,
     setRows: React.PropTypes.func,
     getRows: React.PropTypes.func,
+    setPage: React.PropTypes.func,
+    getPage: React.PropTypes.func,
     onFetchOptions: React.PropTypes.object,
   },
 
-  _setPage(page) { this._page = page; },
-  _getPage() { return this._page; },
+  _setPage(page) {
+    if (this.props.setPage) {
+      this.props.setPage(page)
+      return
+    }
+    this._page = page;
+  },
+  _getPage() {
+    if (this.props.getPage) {
+      return this.props.getPage()
+    }
+    return this._page;
+  },
   _setRows(rows) {
     if (this.props.setRows) {
       this.props.setRows(rows)
