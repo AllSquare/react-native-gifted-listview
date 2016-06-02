@@ -253,7 +253,7 @@ var GiftedListView = React.createClass({
         isRefreshing: true,
       });
       this._setPage(1);
-      this.props.onFetch(this._getPage(), this._postRefresh, options);
+      this.props.onFetch(1, this._postRefresh, options);
     }
   },
 
