@@ -80,6 +80,7 @@ var GiftedListView = React.createClass({
     withSections: React.PropTypes.bool,
     autoPaginate: React.PropTypes.bool,
     onFetch: React.PropTypes.func,
+    onPostFetch: React.PropTypes.func,
 
     paginationFetchingView: React.PropTypes.func,
     paginationAllLoadedView: React.PropTypes.func,
@@ -87,17 +88,14 @@ var GiftedListView = React.createClass({
     emptyView: React.PropTypes.func,
     renderSeparator: React.PropTypes.func,
 
-<<<<<<< HEAD
     dataSource: React.PropTypes.object,
     setRows: React.PropTypes.func,
     getRows: React.PropTypes.func,
     setPage: React.PropTypes.func,
     getPage: React.PropTypes.func,
     onFetchOptions: React.PropTypes.object,
-=======
     rowHasChanged:React.PropTypes.func,
     distinctRows:React.PropTypes.func,
->>>>>>> otherfork/master
   },
 
   _setPage(page) {
@@ -267,6 +265,9 @@ var GiftedListView = React.createClass({
   _postRefresh(rows = [], options = {}) {
     if (this.isMounted()) {
       this._updateRows(rows, options);
+      if (this.props.onPostFetch) {
+        this.props.onPostFetch()
+      }
     }
   },
 
@@ -298,14 +299,14 @@ var GiftedListView = React.createClass({
       mergedRows = this._getRows().concat(rows);
     }
 
-<<<<<<< HEAD
-=======
     if(this.props.distinctRows){
       mergedRows = this.props.distinctRows(mergedRows);
     }
-    
->>>>>>> otherfork/master
+
     this._updateRows(mergedRows, options);
+    if (this.props.onPostFetch) {
+      this.props.onPostFetch()
+    }
   },
 
 
