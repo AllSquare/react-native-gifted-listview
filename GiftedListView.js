@@ -385,6 +385,23 @@ var GiftedListView = React.createClass({
     );
   },
 
+  getRows() {
+    return this._getRows()
+  },
+
+  setAndUpdateRows(rows) {
+    this._setRows(rows)
+
+    let dataSource;
+    if (this.props.withSections === true) {
+      dataSource = this.state.dataSource.cloneWithRowsAndSections(rows)
+    } else {
+      dataSource = this.state.dataSource.cloneWithRows(rows)
+    }
+
+    this.setState({ dataSource })
+  },
+
   defaultStyles: {
     separator: {
       height: 1,
