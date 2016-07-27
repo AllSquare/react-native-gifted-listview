@@ -385,6 +385,10 @@ var GiftedListView = React.createClass({
     );
   },
 
+  scrollTo(options) {
+    this.refs.listview.scrollTo(options)
+  },
+
   getRows() {
     return this._getRows()
   },
