@@ -87,6 +87,8 @@ var GiftedListView = React.createClass({
     emptyView: React.PropTypes.func,
     renderSeparator: React.PropTypes.func,
 
+    dataSource: React.PropTypes.object,
+
     rowHasChanged:React.PropTypes.func,
     distinctRows:React.PropTypes.func,
   },
@@ -102,6 +104,13 @@ var GiftedListView = React.createClass({
   },
   _getRows() {
     return this._rows;
+  },
+  _getRowsLength() {
+    if (this.props.dataSource) {
+      return this.props.dataSource.getRowCount()
+    } else {
+      return this._getRows().length
+    }
   },
 
   paginationFetchingView() {
@@ -190,6 +199,10 @@ var GiftedListView = React.createClass({
       paginationStatus: 'firstLoad',
     }
 
+    if (this.props.dataSource) {
+      return initialState
+    }
+
     if (this.props.withSections === true) {
       ds = new ListView.DataSource({
         rowHasChanged: this.props.rowHasChanged?this.props.rowHasChanged:(row1, row2) => row1 !== row2,
@@ -217,7 +230,9 @@ var GiftedListView = React.createClass({
 
   componentDidMount() {
     this.props.onFetch(this._getPage(), {firstLoad: true}).then(res => {
-      if (!Array.isArray(res)) {
+      if (this.props.dataSource) {
+        this._postRefresh([], res ? res.options : {})
+      } else if (!Array.isArray(res)) {
         this._postRefresh(res.rows, res.options)
       } else {
         this._postRefresh(res, {})
@@ -240,7 +255,9 @@ var GiftedListView = React.createClass({
       });
       this._setPage(1);
       this.props.onFetch(1, options).then(res => {
-        if (!Array.isArray(res)) {
+        if (this.props.dataSource) {
+          this._postRefresh([], res ? res.options : {})
+        } else if (!Array.isArray(res)) {
           this._postRefresh(res.rows, res.options)
         } else {
           this._postRefresh(res, {})
@@ -273,7 +290,9 @@ var GiftedListView = React.createClass({
     if (this.state.paginationStatus === 'firstLoad' || this.state.paginationStatus === 'waiting') {
       this.setState({paginationStatus: 'fetching'});
       this.props.onFetch(this._getPage() + 1, {}).then(res => {
-        if (!Array.isArray(res)) {
+        if (this.props.dataSource) {
+          this._postRefresh([], res ? res.options : {})
+        } else if (!Array.isArray(res)) {
           this._postPaginate(res.rows, res.options)
         } else {
           this._postPaginate(res, {})
@@ -313,10 +332,12 @@ var GiftedListView = React.createClass({
     if (rows !== null) {
       this._setRows(rows);
 
-      if (this.props.withSections === true) {
-        state.dataSource = this.state.dataSource.cloneWithRowsAndSections(rows);
-      } else {
-        state.dataSource = this.state.dataSource.cloneWithRows(rows);
+      if (!this.props.dataSource) {
+        if (this.props.withSections === true) {
+          state.dataSource = this.state.dataSource.cloneWithRowsAndSections(rows);
+        } else {
+          state.dataSource = this.state.dataSource.cloneWithRows(rows);
+        }
       }
     }
 
@@ -334,11 +355,11 @@ var GiftedListView = React.createClass({
 
     if ((this.state.paginationStatus === 'fetching' && paginationEnabled) || (this.state.paginationStatus === 'firstLoad' && this.props.firstLoader === true)) {
       return this.paginationFetchingView();
-    } else if (this.state.paginationStatus === 'waiting' && this.props.pagination === true && (this.props.withSections === true || this._getRows().length > 0)) { //never show waiting for autoPaginate
+    } else if (this.state.paginationStatus === 'waiting' && this.props.pagination === true && (this.props.withSections === true || this._getRowsLength() > 0)) { //never show waiting for autoPaginate
       return this.paginationWaitingView(this._onPaginate);
     } else if (this.state.paginationStatus === 'allLoaded' && paginationEnabled) {
       return this.paginationAllLoadedView();
-    } else if (this._getRows().length === 0) {
+    } else if (this._getRowsLength() === 0) {
       return this.emptyView(this._onRefresh);
     } else {
       return null;
@@ -387,23 +408,6 @@ var GiftedListView = React.createClass({
 
   scrollTo(options) {
     this.refs.listview.scrollTo(options)
-  },
-
-  getRows() {
-    return this._getRows()
-  },
-
-  setAndUpdateRows(rows) {
-    this._setRows(rows)
-
-    let dataSource;
-    if (this.props.withSections === true) {
-      dataSource = this.state.dataSource.cloneWithRowsAndSections(rows)
-    } else {
-      dataSource = this.state.dataSource.cloneWithRows(rows)
-    }
-
-    this.setState({ dataSource })
   },
 
   defaultStyles: {
