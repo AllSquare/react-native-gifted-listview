@@ -88,6 +88,7 @@ var GiftedListView = React.createClass({
     renderSeparator: React.PropTypes.func,
 
     dataSource: React.PropTypes.object,
+    onRefresh: React.PropTypes.func,
 
     rowHasChanged:React.PropTypes.func,
     distinctRows:React.PropTypes.func,
@@ -229,7 +230,7 @@ var GiftedListView = React.createClass({
   },
 
   componentDidMount() {
-    this.props.onFetch(this._getPage(), {firstLoad: true}).then(res => {
+    this.props.onFetch(this._getPage(), {firstLoad: true, isRefreshing: false}).then(res => {
       if (this.props.dataSource) {
         this._postRefresh([], res ? res.options : {})
       } else if (!Array.isArray(res)) {
@@ -254,7 +255,7 @@ var GiftedListView = React.createClass({
         isRefreshing: true,
       });
       this._setPage(1);
-      this.props.onFetch(1, options).then(res => {
+      this.props.onFetch(1, { ...options, isRefreshing: true }).then(res => {
         if (this.props.dataSource) {
           this._postRefresh([], res ? res.options : {})
         } else if (!Array.isArray(res)) {
@@ -289,7 +290,7 @@ var GiftedListView = React.createClass({
   _onPaginate() {
     if (this.state.paginationStatus === 'firstLoad' || this.state.paginationStatus === 'waiting') {
       this.setState({paginationStatus: 'fetching'});
-      this.props.onFetch(this._getPage() + 1, {}).then(res => {
+      this.props.onFetch(this._getPage() + 1, { isRefreshing: false }).then(res => {
         if (this.props.dataSource) {
           this._postRefresh([], res ? res.options : {})
         } else if (!Array.isArray(res)) {
