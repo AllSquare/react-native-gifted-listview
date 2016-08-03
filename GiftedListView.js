@@ -127,7 +127,7 @@ var GiftedListView = React.createClass({
   },
   paginationAllLoadedView() {
     if (this.props.paginationAllLoadedView) {
-      return this.props.paginationAllLoadedView();
+      return this.props.paginationAllLoadedView(this._getRowsLength());
     }
 
     return (
