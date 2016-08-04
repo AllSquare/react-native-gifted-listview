@@ -292,7 +292,7 @@ var GiftedListView = React.createClass({
       this.setState({paginationStatus: 'fetching'});
       this.props.onFetch(this._getPage() + 1, { isRefreshing: false }).then(res => {
         if (this.props.dataSource) {
-          this._postRefresh([], res ? res.options : {})
+          this._postPaginate([], res ? res.options : {})
         } else if (!Array.isArray(res)) {
           this._postPaginate(res.rows, res.options)
         } else {
