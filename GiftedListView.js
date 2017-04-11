@@ -411,6 +411,10 @@ var GiftedListView = React.createClass({
     this.refs.listview.scrollTo(options)
   },
 
+  scrollToEnd(options) {
+    this.refs.listview.scrollToEnd(options)
+  },
+
   defaultStyles: {
     separator: {
       height: 1,
